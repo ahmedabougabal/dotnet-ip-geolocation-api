@@ -2,6 +2,11 @@ namespace CountryBlockingAPI.Models;
 
 public class CountryInfo
 {
+    // error handling 
+    public bool Error { get; set; }
+    public string Reason { get; set; }
+
+    // api's json output props from the ipapi.co documentation 
     public string? Ip { get; set; }
     public string? City { get; set; }
     public string? Region { get; set; }
