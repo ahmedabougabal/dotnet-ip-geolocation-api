@@ -1,4 +1,4 @@
-using System.Collections.Concurrent
+using System.Collections.Concurrent;
 using CountryBlockingAPI.Interfaces;
 using CountryBlockingAPI.Models;
 
@@ -6,9 +6,9 @@ namespace CountryBlockingAPI.Repositories;
 
 public class TemporalBlockRepository : ITemporalBlockRepository
 {
-    private readonly ConcurrentDictionary<string, TemporalBlock> _temporalBlocks = new(stringComparer.OrdinalIgnoreCase);
+    private readonly ConcurrentDictionary<string, TemporalBlock> _temporalBlocks = new(StringComparer.OrdinalIgnoreCase);
 
-    public Task<bool> AddTemporalBlockSync(TemporalBlock temporalBlock)
+    public Task<bool> AddTemporalBlockAsync(TemporalBlock temporalBlock)
     {
         if (string.IsNullOrWhiteSpace(temporalBlock.CountryCode))
             return Task.FromResult(false);
@@ -24,7 +24,7 @@ public class TemporalBlockRepository : ITemporalBlockRepository
         return Task.FromResult(_temporalBlocks.TryRemove(countryCode, out _));
     }
 
-    public Task<bool> IsCountryTemporallyBlockedASync(string countryCode) // check if a country is temp blocked
+    public Task<bool> IsCountryTemporallyBlockedAsync(string countryCode) // check if a country is temp blocked
     {
         if (string.IsNullOrWhiteSpace(countryCode))
             return Task.FromResult(false);
@@ -47,11 +47,11 @@ public class TemporalBlockRepository : ITemporalBlockRepository
     public Task<IEnumerable<TemporalBlock>> GetExpiredTemporalBlocksAsync()
     {
         var now = DateTime.UtcNow;
-        var expiredBlocks = _temporalBlocks.Values.Where(block =>  block.ExpirationTime < now)
-            .Select(block => block.CountryCode)
+        var expiredBlocks = _temporalBlocks.Values
+            .Where(block => block.ExpirationTime < now)
             .ToList();
 
-        return Task.FromResult<IEnumerable<string>>(expiredBlocks);
+        return Task.FromResult<IEnumerable<TemporalBlock>>(expiredBlocks);
     }
 
 
@@ -65,14 +65,4 @@ public class TemporalBlockRepository : ITemporalBlockRepository
 
         return Task.FromResult<IEnumerable<string>>(validBlocks);
     }
-
-
-
 }
-
-
-
-
-
-
-
