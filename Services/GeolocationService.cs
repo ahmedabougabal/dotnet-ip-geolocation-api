@@ -8,25 +8,25 @@ using Microsoft.Extensions.Options;
 // responsible for calling the 3rd party geoService api (ipapi.co) to fetch country info based on IP address
 namespace CountryBlockingAPI.Services;
 
-public class GeoLocationService : IGeoLocationService
+public class GeolocationService : IGeolocationService
 {
     private readonly HttpClient _httpClient;
-    private readonly ILogger<GeoLocationService> _logger;
+    private readonly ILogger<GeolocationService> _logger;
 
     // dependency injection
-    public GeoLocationService(HttpClient httpClient, ILogger<GeoLocationService> logger)
+    public GeolocationService(HttpClient httpClient, ILogger<GeolocationService> logger)
     {
         _httpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
 
-    public async Task<CountryInfo> GetCountryInfoByIpAsync(string ipAddress)
+    public async Task<CountryInfo?> GetCountryInfoByIpAsync(string ipAddress)
     {
         try
         {
             if (string.IsNullOrWhiteSpace(ipAddress))
             {
-                _logger.LogWarning("this is an invalid IP address...");
+                _logger.LogWarning("Invalid IP address provided");
                 return null;
             }
             // according to documentation -> https://ipapi.co/{ip}/json/
@@ -34,7 +34,8 @@ public class GeoLocationService : IGeoLocationService
 
             if (!response.IsSuccessStatusCode)
             {
-                _logger.LogWarning($"failed to get country info for IP {ipAddress}. status code : {response.StatusCode} ");
+                _logger.LogWarning("Failed to get country info for IP {IpAddress}. Status code: {StatusCode}", 
+                    ipAddress, response.StatusCode);
                 return null;
             }
 
@@ -43,7 +44,8 @@ public class GeoLocationService : IGeoLocationService
             // check if the response contains an error
             if(countryInfo?.Error == true)
             {
-                _logger.LogWarning($"Error from the ipapi.co for IpAddress {ipAddress}, reason : {countryInfo.Reason}");
+                _logger.LogWarning("Error from ipapi.co for IP {IpAddress}: {Reason}", 
+                    ipAddress, countryInfo.Reason);
                 return null;
             }
 
@@ -51,12 +53,8 @@ public class GeoLocationService : IGeoLocationService
         } 
         catch(Exception ex) 
         {
-            _logger.LogWarning(ex, $"Could not find {ipAddress}");
+            _logger.LogError(ex, "Error getting country info for IP {IpAddress}", ipAddress);
             return null;
         }
     }
-
-
-
 }
-
