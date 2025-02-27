@@ -16,7 +16,7 @@ public class TemporalBlockRepository : ITemporalBlockRepository
         return Task.FromResult(_temporalBlocks.TryAdd(temporalBlock.CountryCode, temporalBlock));
     }
 
-    public Task<bool> RemoveTemporalBlockAsync(string countryCode)
+    public Task<bool> RemoveTemporalCountryAsync(string countryCode)
     {
         if (string.IsNullOrWhiteSpace(countryCode))
             return Task.FromResult(false);
