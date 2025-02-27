@@ -24,7 +24,24 @@ public class TemporalBlockRepository : ITemporalBlockRepository
         return Task.FromResult(_temporalBlocks.TryRemove(countryCode, out _));
     }
 
+    public Task<bool> IsCountryTemporallyBlockedASync(string countryCode) // check if a country is temp blocked
+    {
+        if (string.IsNullOrWhiteSpace(countryCode))
+            return Task.FromResult(false);
 
+        // checks if country exists
+        if (!_temporalBlocks.TryGetValue(countryCode, out var block)) 
+            return Task.FromResult(false);
+
+        //this is condition is for checking whether the block on a country has expired or not
+        if (block.ExpirationTime < DateTime.UtcNow)
+        {
+            _temporalBlocks.TryRemove(countryCode, out _); // remove expired block of a country
+            return Task.FromResult(false); // country is no longer blocked
+        }
+
+        return Task.FromResult(true); // country is blocked
+    }
 
 
 }
