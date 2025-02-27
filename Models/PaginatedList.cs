@@ -33,7 +33,7 @@ public class PaginatedList<T> // used generic type param to allow the class to w
 
         var list = source.ToList();
         var count = list.Count;
-        var items  list.Skip((pageIndex- 1) * pageSize).Take(pageSize).ToList();
+        var items = list.Skip((pageIndex- 1) * pageSize).Take(pageSize).ToList();
         return new PaginatedList<T>(items, count, pageIndex, pageSize);
     }
 
