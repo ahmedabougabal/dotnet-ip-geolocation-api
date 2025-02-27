@@ -20,6 +20,32 @@ public class GeoLocationService : IGeoLocationService
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
 
+    public async Task<CountryInfo> GetCountryInfoByIpAsync(string ipAddress)
+    {
+        try
+        {
+            if (string.IsNullOrWhiteSpace(ipAddress))
+            {
+                _logger.LogWarning("this is an invalid IP address...");
+                return null;
+            }
+            // according to documentation -> https://ipapi.co/{ip}/json/
+            var response = await _httpClient.GetAsync($"{ipAddress}/json/");
+
+            if (!response.IsSuccessStatusCode)
+            {
+                _logger.LogWarning($"failed to get country info for IP {ipAddress}. status code : {response.StatusCode} ");
+                return null;
+            }
+
+
+        } 
+        catch
+        {
+            // exception handling implementation here
+        }
+    }
+
 
 
 }
