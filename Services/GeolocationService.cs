@@ -38,11 +38,21 @@ public class GeoLocationService : IGeoLocationService
                 return null;
             }
 
+            var countryInfo = await response.Content.ReadFromJsonAsync<CountryInfo>();
 
+            // check if the response contains an error
+            if(countryInfo?.Error == true)
+            {
+                _logger.LogWarning($"Error from the ipapi.co for IpAddress {ipAddress}, reason : {countryInfo.Reason}");
+                return null;
+            }
+
+            return countryInfo;
         } 
-        catch
+        catch(Exception ex) 
         {
-            // exception handling implementation here
+            _logger.LogWarning(ex, $"Could not find {ipAddress}");
+            return null;
         }
     }
 
