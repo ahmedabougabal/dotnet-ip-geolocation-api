@@ -5,9 +5,6 @@ namespace CountryBlockingAPI.Interfaces;
 
 public interface IBlockedAttemptsRepository
 {
-    Task AddBlockedAttemptAsync(IBlockedAttempt attempt);
+    Task AddBlockedAttemptAsync(BlockedAttempt attempt);
     Task<PaginatedList<BlockedAttempt>> GetBlockedAttemptsAsync(int pageIndex, int pageSize);
 }
-
-
-
