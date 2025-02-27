@@ -44,6 +44,30 @@ public class TemporalBlockRepository : ITemporalBlockRepository
     }
 
 
+    public Task<IEnumerable<TemporalBlock>> GetExpiredTemporalBlocksAsync()
+    {
+        var now = DateTime.UtcNow;
+        var expiredBlocks = _temporalBlocks.Values.Where(block =>  block.ExpirationTime < now)
+            .Select(block => block.CountryCode)
+            .ToList();
+
+        return Task.FromResult<IEnumerable<string>>(expiredBlocks);
+    }
+
+
+    public Task<IEnumerable<string>> GetAllTemporallyBlockedCountryCodesAsync()
+    {
+        var now = DateTime.UtcNow;
+        var validBlocks = _temporalBlocks.Values
+            .Where(block => block.ExpirationTime >= now)
+            .Select(block => block.CountryCode)
+            .ToList();
+
+        return Task.FromResult<IEnumerable<string>>(validBlocks);
+    }
+
+
+
 }
 
 
