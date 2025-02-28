@@ -1,7 +1,7 @@
-using System.ComponentModel.DataAnnotations
+using System.ComponentModel.DataAnnotations;
+using CountryBlockingAPI.Interfaces;
 using CountryBlockingAPI.Models;
 using Microsoft.AspNetCore.Mvc;
-using CountryBlockingAPI.Interfaces;
 
 namespace CountryBlockingAPI.Controllers;
 
@@ -14,7 +14,8 @@ public class CountriesController : ControllerBase
     private readonly IGeolocationService _geolocationService;
     private readonly ILogger<CountriesController> _logger;
 
-    public CountriesController(IBlockedCountryRepository blockedCountryRepository,
+    public CountriesController(
+        IBlockedCountryRepository blockedCountryRepository,
         ITemporalBlockRepository temporalBlockRepository,
         IGeolocationService geolocationService,
         ILogger<CountriesController> logger)
@@ -24,26 +25,41 @@ public class CountriesController : ControllerBase
         _geolocationService = geolocationService;
         _logger = logger;
     }
-    
-    // this is the POST REQUEST => api/countries/block
+
+    // POST: api/countries/block
     [HttpPost("block")]
-    public async Task<IActionResult> BlockCountry([FromBody] BlockCountryRequest request)
+    public async Task<IActionResult> BlockCountry([FromBody] BlockedAttempt request)
     {
         if (string.IsNullOrWhiteSpace(request.CountryCode))
         {
-            return BadRequest("hey wait, country code is required here...");
+            return BadRequest("Country code is required");
         }
 
-        var countryCode = request.CountryCode.ToUpperInvariant();
+        // Normalize country code
+        request.CountryCode = request.CountryCode.ToUpperInvariant();
 
-        if (await _blockedCountryRepository.IsCountryBlockedAsync(countryCode))
+        // Check if country is already blocked
+        if (await _blockedCountryRepository.IsCountryBlockedAsync(request.CountryCode))
         {
-            return Conflict($"this country of code {countryCode} is already blocked");
+            return Conflict($"Country {request.CountryCode} is already blocked");
         }
 
-    }
-    
-    
-    
-}
+        // Get country info from geolocation service
+        var countryInfo = await _geolocationService.GetCountryInfoByIpAsync(request.IpAddress);
+        if (countryInfo == null)
+        {
+            // If we can't get country info, create a minimal one with just the code
+            countryInfo = new CountryInfo { CountryCode = request.CountryCode };
+        }
 
+        // Add to blocked countries
+        var success = await _blockedCountryRepository.AddBlockedCountryAsync(request.CountryCode, countryInfo);
+        if (!success)
+        {
+            return StatusCode(500, "Failed to block country");
+        }
+
+        _logger.LogInformation("Country {CountryCode} has been blocked", request.CountryCode);
+        return Ok(new { message = $"Country {request.CountryCode} has been blocked" });
+    }
+}
