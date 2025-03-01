@@ -60,10 +60,15 @@ public class IPController : ControllerBase
         {
             return BadRequest("Could not determine IP address");
         }
+        /*
+        If running locally (localhost/127.0.0.1/::1), I will use a default public IP for testing
+        because it is not possible to get an external public IP from localhost as asked in the assignment*/
+        // Check if running locally
+        bool isRunningLocally = ipAddress == "::1" || ipAddress == "127.0.0.1" || ipAddress == "localhost";
+        string originalIpAddress = ipAddress;
 
-        // If running locally (localhost/127.0.0.1/::1), I will use a default public IP for testing
-        // because it is not possible to get an external public IP from localhost as asked in the assignment
-        if (ipAddress == "::1" || ipAddress == "127.0.0.1" || ipAddress == "localhost")
+        // If running locally, use a default public IP for testing
+        if (isRunningLocally)
         {
             // Use a default public IP for testing (Google DNS)
             ipAddress = "8.8.8.8";
@@ -97,12 +102,29 @@ public class IPController : ControllerBase
         // Log the attempt
         await _blockedAttemptsRepository.AddBlockedAttemptAsync(blockedAttempt);
 
-        return Ok(new
+        // Create the response object with additional information for local testing
+        var response = new
         {
             ipAddress = ipAddress,
             countryCode = countryInfo.CountryCode,
             countryName = countryInfo.Country,
             isBlocked = blockedAttempt.IsBlocked
-        });
+        };
+
+        // i have added this additional information for local testing
+        if (isRunningLocally)
+        {
+            return Ok(new
+            {
+                message = "You are running locally and it is not possible to fetch your real external IP address. Using a default IP address for testing purposes.",
+                localIpAddress = originalIpAddress,
+                testIpAddress = ipAddress,
+                countryCode = countryInfo.CountryCode,
+                countryName = countryInfo.Country,
+                isBlocked = blockedAttempt.IsBlocked
+            });
+        }
+
+        return Ok(response);
     }
 }
