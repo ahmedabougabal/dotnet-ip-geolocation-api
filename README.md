@@ -110,3 +110,32 @@ This will open the interactive API documentation where you can test all the endp
 
 
 
+  <img src="https://github.com/Govindv7555/Govindv7555/blob/main/49e76e0596857673c5c80c85b84394c1.gif" width="1000px" height="100px">
+
+## these are some concerns and key takeaways related to Networking Fundamentals encountered when developing this app and testing it locally  
+
+### 1. Empty Response from `/api/logs/blocked-attempts`
+The `/api/logs/blocked-attempts` endpoint returns an empty response because no blocked attempts are recorded when testing locally, (in short : no actual one from a blocked country tried to access this API/Service) 
+
+Thus :
+- No access attempts are made from blocked countries during testing.
+- The logs repository remains empty without sample data.
+
+**Solution**: 
+I have added a sample data generation for blocked attempts has been added when none exist as a mock, ensuring the endpoint returns meaningful data for testing purposes.
+
+---
+
+### 2. Local Environment IP Detection Limitations
+The `/api/ip/check-block` endpoint faces limitations when running locally:
+
+- On `localhost`, `HttpContext.Connection.RemoteIpAddress` returns loopback addresses (`::1` or `127.0.0.1`), which cannot be geolocated.
+- This prevents accurate external IP detection.
+
+**Solution**: 
+I added a localEnviroment logic that has a fallback IP (Google DNS: `8.8.8.8`) is used for testing, along with the local address, while providing a clear message in the response explaining the limitation.
+
+These solutions I implemented ensure a smooth addressing testing challenges and offering transparency.
+
+
+
