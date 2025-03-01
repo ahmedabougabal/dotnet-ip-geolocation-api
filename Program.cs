@@ -44,10 +44,6 @@ app.UseRouting();
 
 app.UseAuthorization();
 
-// Add endpoint middleware
-app.UseEndpoints(endpoints =>
-{
-    endpoints.MapControllers();
-});
+app.MapControllers();
 
 app.Run();
