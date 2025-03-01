@@ -13,3 +13,7 @@
 
 ![image](https://github.com/user-attachments/assets/165a0846-03e1-4059-a31b-b4dc680e973c)
 
+  <img src="https://github.com/Govindv7555/Govindv7555/blob/main/49e76e0596857673c5c80c85b84394c1.gif" width="1000px" height="100px">
+
+# checking for temporally expired countires and flush them out from the memory as per tasked in the assignment 
+![image](https://github.com/user-attachments/assets/b79db62e-9188-4ad8-b619-37ca5a430a3d)
