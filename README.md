@@ -125,7 +125,7 @@ This will open the interactive API documentation where you can test all the endp
 ## these are some concerns and key takeaways related to Networking Fundamentals encountered when developing this app and testing it locally  
 
 ### 1. Empty Response from `/api/logs/blocked-attempts`
-The `/api/logs/blocked-attempts` endpoint returns an empty response because no blocked attempts are recorded when testing locally, (in short : no actual one from a blocked country tried to access this API/Service) 
+The `/api/logs/blocked-attempts` endpoint returns an empty response because no blocked attempts are recorded from outside (a real user with a real IP address from a restricted country) when testing locally, (in short : no actual one from a blocked country tried to access this API/Service) 
 
 Thus :
 - No access attempts are made from blocked countries during testing.
