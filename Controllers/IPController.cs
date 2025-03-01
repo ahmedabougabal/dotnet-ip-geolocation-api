@@ -61,6 +61,15 @@ public class IPController : ControllerBase
             return BadRequest("Could not determine IP address");
         }
 
+        // If running locally (localhost/127.0.0.1/::1), I will use a default public IP for testing
+        // because it is not possible to get an external public IP from localhost as asked in the assignment
+        if (ipAddress == "::1" || ipAddress == "127.0.0.1" || ipAddress == "localhost")
+        {
+            // Use a default public IP for testing (Google DNS)
+            ipAddress = "8.8.8.8";
+            _logger.LogInformation("Using default public IP {IpAddress} for local testing", ipAddress);
+        }
+
         var countryInfo = await _geolocationService.GetCountryInfoByIpAsync(ipAddress);
         if (countryInfo == null)
         {
