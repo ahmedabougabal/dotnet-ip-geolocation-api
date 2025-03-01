@@ -145,7 +145,7 @@ The `/api/ip/check-block` endpoint faces limitations when running locally:
 **Solution**: 
 I added a localEnviroment logic that has a fallback IP (Google DNS: `8.8.8.8`) is used for testing, along with the local address, while providing a clear message in the response explaining the limitation.
 
-These solutions I implemented ensure a smooth addressing testing challenges and offering transparency.
+These solutions I implemented to ensure a smooth addressing testing challenges and offering transparency.
 
-
+> The End :D - made with ❤️ by Ahmed Abou Gabal 
 
