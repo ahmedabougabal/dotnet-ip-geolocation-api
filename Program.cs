@@ -2,6 +2,7 @@ using CountryBlockingAPI.Interfaces;
 using CountryBlockingAPI.Services;
 using CountryBlockingAPI.Repositories;
 using CountryBlockingAPI.Models;
+using CountryBlockingAPI.BackgroundServices;
 using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -27,6 +28,9 @@ builder.Services.AddHttpClient<IGeolocationService, GeolocationService>(client =
     var baseUrl = builder.Configuration["GeolocationApi:BaseUrl"];
     client.BaseAddress = new Uri(baseUrl ?? "https://ipapi.co/");
 });
+
+// Register background services
+builder.Services.AddHostedService<TemporalBlockCleanupService>();
 
 var app = builder.Build();
 

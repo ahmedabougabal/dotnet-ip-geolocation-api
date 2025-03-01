@@ -65,4 +65,23 @@ public class TemporalBlockRepository : ITemporalBlockRepository
 
         return Task.FromResult<IEnumerable<string>>(validBlocks);
     }
+
+    public Task<int> RemoveExpiredBlocksAsync()
+    {
+        var now = DateTime.UtcNow;
+        var expiredBlocks = _temporalBlocks.Values
+            .Where(block => block.ExpirationTime < now)
+            .ToList();
+
+        int count = 0;
+        foreach (var block in expiredBlocks)
+        {
+            if (_temporalBlocks.TryRemove(block.CountryCode, out _))
+            {
+                count++;
+            }
+        }
+
+        return Task.FromResult(count);
+    }
 }

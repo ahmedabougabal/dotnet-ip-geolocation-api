@@ -9,4 +9,5 @@ public interface ITemporalBlockRepository
     Task<bool> IsCountryTemporallyBlockedAsync(string countryCode);
     Task<IEnumerable<TemporalBlock>> GetExpiredTemporalBlocksAsync();
     Task<IEnumerable<string>> GetAllTemporallyBlockedCountryCodesAsync();
+    Task<int> RemoveExpiredBlocksAsync();
 }
