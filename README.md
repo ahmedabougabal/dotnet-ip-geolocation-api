@@ -73,6 +73,16 @@ This will open the interactive API documentation where you can test all the endp
 
   <img src="https://github.com/Govindv7555/Govindv7555/blob/main/49e76e0596857673c5c80c85b84394c1.gif" width="1000px" height="100px">
 
+## Design Patterns & Clean Code Arch & Separation of concerns were carefully taken into consideration when engineering this app.
+
+- Repository Pattern :  to abstract data access logic
+- Dependency Injection : registration of services and repositories using the built-in DI container
+- Service Layer Pattern : The GeolocationService encapsulates external API communication
+- Factory Pattern: HttpClientFactory for creating HttpClient instances
+- Singleton Pattern :  repositories are registered as singletons to maintain in-memory state
+
+
+  <img src="https://github.com/Govindv7555/Govindv7555/blob/main/49e76e0596857673c5c80c85b84394c1.gif" width="1000px" height="100px">
 
 
 # Testing my Implementation  
@@ -122,11 +132,11 @@ Thus :
 - The logs repository remains empty without sample data.
 
 **Solution**: 
-I have added a sample data generation for blocked attempts has been added when none exist as a mock, ensuring the endpoint returns meaningful data for testing purposes.
+I have added a sample data generation for blocked attempts as a mock testing, ensuring the endpoint returns meaningful data for local testing purposes.
 
 ---
 
-### 2. Local Environment IP Detection Limitations
+### 2. Local Environment IP Detection Limitations (it is not possible - when running locally - to get the real external IP address from HttpContext so a default public IP is used instead that's all)
 The `/api/ip/check-block` endpoint faces limitations when running locally:
 
 - On `localhost`, `HttpContext.Connection.RemoteIpAddress` returns loopback addresses (`::1` or `127.0.0.1`), which cannot be geolocated.
