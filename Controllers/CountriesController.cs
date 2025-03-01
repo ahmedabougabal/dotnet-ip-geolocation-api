@@ -49,6 +49,12 @@ public class CountriesController : ControllerBase
             // Normalize country code
             request.CountryCode = request.CountryCode.ToUpperInvariant();
 
+            // Validate country code format (must be exactly 2 letters)
+            if (!IsValidCountryCode(request.CountryCode))
+            {
+                return BadRequest($"Invalid country code: {request.CountryCode}. Country code must be a valid ISO 3166-1 alpha-2 code.");
+            }
+
             // Check if country is already blocked
             if (await _blockedCountryRepository.IsCountryBlockedAsync(request.CountryCode))
             {
@@ -93,6 +99,12 @@ public class CountriesController : ControllerBase
 
         countryCode = countryCode.ToUpperInvariant();
 
+        // Validate country code format (must be exactly 2 letters)
+        if (!IsValidCountryCode(countryCode))
+        {
+            return BadRequest($"Invalid country code: {countryCode}. Country code must be a valid ISO 3166-1 alpha-2 code.");
+        }
+
         if (!await _blockedCountryRepository.IsCountryBlockedAsync(countryCode))
         {
             return NotFound($"Country {countryCode} is not blocked");
@@ -136,6 +148,12 @@ public class CountriesController : ControllerBase
 
         request.CountryCode = request.CountryCode.ToUpperInvariant();
 
+        // Validate country code format (must be exactly 2 letters)
+        if (!IsValidCountryCode(request.CountryCode))
+        {
+            return BadRequest($"Invalid country code: {request.CountryCode}. Country code must be a valid ISO 3166-1 alpha-2 code.");
+        }
+
         // Check if country is already temporarily blocked
         if (await _temporalBlockRepository.IsCountryTemporallyBlockedAsync(request.CountryCode))
         {
@@ -159,7 +177,41 @@ public class CountriesController : ControllerBase
         
         return Ok(new { 
             message = $"Country {request.CountryCode} has been temporarily blocked for {request.DurationMinutes} minutes",
-            expiresAt = temporalBlock.ExpirationTime
+            expirationTime = temporalBlock.ExpirationTime
         });
+    }
+
+    // Helper method to validate country codes
+    private bool IsValidCountryCode(string countryCode)
+    {
+        // Check if the country code is exactly 2 uppercase letters
+        if (string.IsNullOrEmpty(countryCode) || countryCode.Length != 2)
+        {
+            return false;
+        }
+
+        // Check if the country code consists only of letters
+        foreach (char c in countryCode)
+        {
+            if (!char.IsLetter(c))
+            {
+                return false;
+            }
+        }
+
+        // List of invalid/example country codes that should be rejected
+        var invalidCodes = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+        {
+            "XX", // Commonly used as example/placeholder
+            "ZZ", // Commonly used as example/placeholder
+            "XY", // Not assigned
+            "XZ", // Not assigned
+            "YZ", // Not assigned
+            "YY", // Not assigned
+            "ZX", // Not assigned
+            "ZY"  // Not assigned
+        };
+
+        return !invalidCodes.Contains(countryCode);
     }
 }
