@@ -9,12 +9,12 @@ Finally implemented a light-weight yet powerful and a scalable also an effeician
 
 ---
 
-# key features 
-- in-memory data storage without database dependencies
-- third-part geolocation integration
-- backround processing of temporary expired countries without performance overhead
+# key features and what makes it ideal & Great! 
+- in-memory data storage without database dependencies 
 - thread-safe under concurrent operations. (refer to microsoft docs about concurrent dictionaries/hashtables)
+- third-party geolocation integration
 - comprehensive validation and testing at every level
+- backround processing of temporary expired countries without performance overhead
 
 
 ## How to Install and Run the Country Blocking API
@@ -30,6 +30,7 @@ Follow these steps to install and run the Country Blocking API on your local mac
 1. **Clone the repository:**
 
     ```bash
+    <git clone SSH>
     git clone https://github.com/ahmedabougabal/dotnet-ip-geolocation-api.git
     ```
 
@@ -146,6 +147,8 @@ The `/api/ip/check-block` endpoint faces limitations when running locally:
 I added a localEnviroment logic that has a fallback IP (Google DNS: `8.8.8.8`) is used for testing, along with the local address, while providing a clear message in the response explaining the limitation.
 
 These solutions I implemented to ensure a smooth addressing testing challenges and offering transparency.
+
+<br /> 
 
 > The End :D - made with ❤️ by Ahmed Abou Gabal 
 
