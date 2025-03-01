@@ -1,25 +1,27 @@
-/*separating API Logic in a dedicated service*/
 using System.Net.Http.Json;
 using CountryBlockingAPI.Interfaces;
 using CountryBlockingAPI.Models;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
-// responsible for calling the 3rd party geoService api (ipapi.co) to fetch country info based on IP address
 namespace CountryBlockingAPI.Services;
 
 public class GeolocationService : IGeolocationService
 {
     private readonly HttpClient _httpClient;
     private readonly ILogger<GeolocationService> _logger;
-    private readonly bool _isTestMode;
+    private readonly string _userAgent;
+    private static DateTime _lastRequestTime = DateTime.MinValue;
+    private static readonly SemaphoreSlim _semaphore = new SemaphoreSlim(1, 1);
 
-    // dependency injection
     public GeolocationService(HttpClient httpClient, ILogger<GeolocationService> logger, IConfiguration configuration)
     {
         _httpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-        _isTestMode = configuration.GetValue<bool>("GeolocationApi:TestMode");
+        _userAgent = "CountryBlockingAPI/1.0";
+
+        // Set default headers
+        _httpClient.DefaultRequestHeaders.Add("User-Agent", _userAgent);
     }
 
     public async Task<CountryInfo?> GetCountryInfoByIpAsync(string ipAddress)
@@ -32,55 +34,57 @@ public class GeolocationService : IGeolocationService
                 return null;
             }
 
-            // this is for test mode, return mock data "just for testing purposes"
-            if (_isTestMode)
+            // Respect rate limits - only 1 request per second
+            await _semaphore.WaitAsync();
+            try
             {
-                return new CountryInfo 
-                { 
-                    Ip = ipAddress,
-                    CountryCode = "US",
-                    Country = "United States",
-                    City = "Test City"
-                };
+                var timeSinceLastRequest = DateTime.UtcNow - _lastRequestTime;
+                if (timeSinceLastRequest.TotalMilliseconds < 1000)
+                {
+                    var delayMs = 1000 - (int)timeSinceLastRequest.TotalMilliseconds;
+                    if (delayMs > 0)
+                    {
+                        await Task.Delay(delayMs);
+                    }
+                }
+
+                // Make the API call
+                _lastRequestTime = DateTime.UtcNow;
+                var response = await _httpClient.GetAsync($"{ipAddress}/json/");
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    _logger.LogWarning("Failed to get country info for IP {IpAddress}. Status code: {StatusCode}", 
+                        ipAddress, response.StatusCode);
+                    return null;
+                }
+
+                var responseContent = await response.Content.ReadAsStringAsync();
+                _logger.LogInformation("API Response: {Response}", responseContent);
+
+                var countryInfo = await response.Content.ReadFromJsonAsync<CountryInfo>();
+                if (countryInfo == null)
+                {
+                    _logger.LogWarning("Failed to parse country info for IP {IpAddress}", ipAddress);
+                    return null;
+                }
+
+                // Check if the response indicates an error
+                if (countryInfo.Error)
+                {
+                    _logger.LogWarning("Error from ipapi.co for IP {IpAddress}: {Reason}", 
+                        ipAddress, countryInfo.Reason);
+                    return null;
+                }
+
+                return countryInfo;
             }
-
-            // Add delay to respect rate limiting (1 request per second for free tier according to ipapi.co docs)
-            await Task.Delay(1000);
-
-            var response = await _httpClient.GetAsync($"{ipAddress}/json/");
-
-            if (response.StatusCode == System.Net.HttpStatusCode.TooManyRequests)
+            finally
             {
-                _logger.LogWarning("Rate limit exceeded for IP {IpAddress}", ipAddress);
-                // Return a basic response instead of null
-                return new CountryInfo 
-                { 
-                    Ip = ipAddress,
-                    CountryCode = "US",
-                    Country = "United States"
-                };
+                _semaphore.Release();
             }
-
-            if (!response.IsSuccessStatusCode)
-            {
-                _logger.LogWarning("Failed to get country info for IP {IpAddress}. Status code: {StatusCode}", 
-                    ipAddress, response.StatusCode);
-                return null;
-            }
-
-            var countryInfo = await response.Content.ReadFromJsonAsync<CountryInfo>();
-
-            // check if the response contains an error
-            if(countryInfo?.Error == true)
-            {
-                _logger.LogWarning("Error from ipapi.co for IP {IpAddress}: {Reason}", 
-                    ipAddress, countryInfo.Reason);
-                return null;
-            }
-
-            return countryInfo;
-        } 
-        catch(Exception ex) 
+        }
+        catch (Exception ex)
         {
             _logger.LogError(ex, "Error getting country info for IP {IpAddress}", ipAddress);
             return null;
