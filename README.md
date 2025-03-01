@@ -12,7 +12,7 @@ Finally implemented a light-weight yet powerful and a scalable also an effeician
 # key features 
 - in-memory data storage without database dependencies
 - third-part geolocation integration
-- backround processing of temporary expired countries with performance overhead
+- backround processing of temporary expired countries without performance overhead
 - thread-safe under concurrent operations. (refer to microsoft docs about concurrent dictionaries/hashtables)
 - comprehensive validation and testing at every level
 
