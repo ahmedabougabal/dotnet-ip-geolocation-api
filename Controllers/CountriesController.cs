@@ -113,13 +113,16 @@ public class CountriesController : ControllerBase
 
     // GET: api/countries/blocked
     [HttpGet("blocked")]
-    public async Task<IActionResult> GetBlockedCountries([FromQuery] int pageIndex = 1, [FromQuery] int pageSize = 10)
+    public async Task<IActionResult> GetBlockedCountries(
+        [FromQuery] int pageIndex = 1, 
+        [FromQuery] int pageSize = 10,
+        [FromQuery] string? searchTerm = null)
     {
         if (pageIndex < 1) pageIndex = 1;
         if (pageSize < 1) pageSize = 10;
         if (pageSize > 100) pageSize = 100;
 
-        var blockedCountries = await _blockedCountryRepository.GetBlockedCountriesAsync(pageIndex, pageSize);
+        var blockedCountries = await _blockedCountryRepository.GetBlockedCountriesAsync(pageIndex, pageSize, searchTerm);
         return Ok(blockedCountries);
     }
 
