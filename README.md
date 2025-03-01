@@ -51,6 +51,11 @@ Follow these steps to install and run the Country Blocking API on your local mac
     dotnet run
     ```
 
+
+### this should be what you see
+![update](https://github.com/user-attachments/assets/2f4050c9-4108-4524-9520-6de744910b34)
+
+
 ### Accessing Swagger UI
 
 
@@ -93,3 +98,6 @@ This will open the interactive API documentation where you can test all the endp
 
 # checking for Temporarily expired countires and flush them out from the memory as required
 ![image](https://github.com/user-attachments/assets/b79db62e-9188-4ad8-b619-37ca5a430a3d)
+
+
+
