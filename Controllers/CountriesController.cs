@@ -31,19 +31,13 @@ public class CountriesController : ControllerBase
 
     // POST: api/countries/block
     [HttpPost("block")]
-    public async Task<IActionResult> BlockCountry([FromBody] BlockedAttempt request)
+    public async Task<IActionResult> BlockCountry([FromBody] BlockCountryRequest request)
     {
         try
         {
             if (string.IsNullOrWhiteSpace(request.CountryCode))
             {
                 return BadRequest("Country code is required");
-            }
-
-            // Use a valid IP address for testing if none provided
-            if (string.IsNullOrWhiteSpace(request.IpAddress))
-            {
-                request.IpAddress = "8.8.8.8"; // Google's DNS server (US)
             }
 
             // Normalize country code
@@ -61,16 +55,13 @@ public class CountriesController : ControllerBase
                 return Conflict($"Country {request.CountryCode} is already blocked");
             }
 
-            // Get country info from geolocation service
-            var countryInfo = await _geolocationService.GetCountryInfoByIpAsync(request.IpAddress);
-            if (countryInfo == null)
+            // Create a default CountryInfo object with the country code
+            var countryInfo = new CountryInfo
             {
-                return BadRequest($"Could not get country information for IP {request.IpAddress}. Please check the IP address and try again.");
-            }
+                CountryCode = request.CountryCode,
+                CountryName = request.CountryCode // Use code as name initially, can be updated later
+            };
 
-            // Make sure the country code in the country info matches the requested code
-            countryInfo.CountryCode = request.CountryCode;
-            
             // Add to blocked countries
             var success = await _blockedCountryRepository.AddBlockedCountryAsync(request.CountryCode, countryInfo);
             if (!success)
