@@ -7,7 +7,7 @@ public class CountryInfo
     public string Reason { get; set; } = string.Empty;
 
     // api's json output props from the ipapi.co documentation 
-    public string? Ip { get; set; }
+    public string Ip { get; set; } = string.Empty;
     public string? City { get; set; }
     public string? Region { get; set; }
     public string? RegionCode { get; set; }
@@ -32,4 +32,38 @@ public class CountryInfo
     public string? Languages { get; set; }
     public string? Asn { get; set; }
     public string? Org { get; set; }
+
+    public CountryInfo Clone()
+    {
+        return new CountryInfo
+        {
+            Error = Error,
+            Reason = Reason,
+            Ip = Ip,
+            City = City,
+            Region = Region,
+            RegionCode = RegionCode,
+            Country = Country,
+            CountryCode = CountryCode,
+            CountryCodeIso3 = CountryCodeIso3,
+            CountryName = CountryName,
+            CountryCapital = CountryCapital,
+            CountryTld = CountryTld,
+            CountryArea = CountryArea,
+            CountryPopulation = CountryPopulation,
+            ContinentCode = ContinentCode,
+            InEu = InEu,
+            Postal = Postal,
+            Latitude = Latitude,
+            Longitude = Longitude,
+            Timezone = Timezone,
+            UtcOffset = UtcOffset,
+            CountryCallingCode = CountryCallingCode,
+            Currency = Currency,
+            CurrencyName = CurrencyName,
+            Languages = Languages,
+            Asn = Asn,
+            Org = Org
+        };
+    }
 }

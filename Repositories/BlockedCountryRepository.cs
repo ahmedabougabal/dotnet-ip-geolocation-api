@@ -1,4 +1,4 @@
-using System.Collections.Concurrent; // as per task requiement , works safely when multiple users access this dict simaltanously
+using System.Collections.Concurrent;
 using CountryBlockingAPI.Interfaces;
 using CountryBlockingAPI.Models;
 
@@ -14,8 +14,11 @@ public class BlockedCountryRepository : IBlockedCountryRepository
     {
         if (string.IsNullOrEmpty(countryCode)) // error handling when country code is null or " "
             return Task.FromResult(false);
+
+        // Ensure the country code in the info matches the key
+        countryInfo.CountryCode = countryCode.ToUpperInvariant();
         
-        return Task.FromResult(_blockedCountries.TryAdd(countryCode, countryInfo)); // task for async
+        return Task.FromResult(_blockedCountries.TryAdd(countryCode.ToUpperInvariant(), countryInfo)); // task for async
     }
 
     public Task<bool> RemoveBlockedCountryAsync(string countryCode)
@@ -23,7 +26,7 @@ public class BlockedCountryRepository : IBlockedCountryRepository
         if (string.IsNullOrWhiteSpace(countryCode))
             return Task.FromResult(false);
 
-        return Task.FromResult(_blockedCountries.TryRemove(countryCode, out _));
+        return Task.FromResult(_blockedCountries.TryRemove(countryCode.ToUpperInvariant(), out _));
     }
 
 
@@ -32,7 +35,7 @@ public class BlockedCountryRepository : IBlockedCountryRepository
         if (string.IsNullOrWhiteSpace(countryCode))
             return Task.FromResult(false);
 
-        return Task.FromResult(_blockedCountries.ContainsKey(countryCode)); // returns true if the country is blocked
+        return Task.FromResult(_blockedCountries.ContainsKey(countryCode.ToUpperInvariant())); // returns true if the country is blocked
     }
 
 
@@ -40,12 +43,18 @@ public class BlockedCountryRepository : IBlockedCountryRepository
     {
         var query = _blockedCountries.Values.AsQueryable();
 
+        // Apply search filter if provided
         if (!string.IsNullOrWhiteSpace(searchTerm))
         {
+            searchTerm = searchTerm.Trim();
             query = query.Where(c =>
             (c.CountryCode != null && c.CountryCode.Contains(searchTerm, StringComparison.OrdinalIgnoreCase)) ||
             (c.CountryName != null && c.CountryName.Contains(searchTerm, StringComparison.OrdinalIgnoreCase)));
         }
+
+        // Order by country code for consistent results
+        query = query.OrderBy(c => c.CountryCode);
+
         return Task.FromResult(PaginatedList<CountryInfo>.Create(query, pageIndex, pageSize));
     }
 
