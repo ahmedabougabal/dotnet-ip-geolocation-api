@@ -17,6 +17,59 @@ Finally implemented a light-weight yet powerful and a scalable also an effeician
 - comprehensive validation and testing at every level
 
 
+## How to Install and Run the Country Blocking API
+
+Follow these steps to install and run the Country Blocking API on your local machine:
+
+### Prerequisites
+- **.NET 8.0 SDK** or later installed on your machine
+- **Git** (to clone the repository)
+
+### Installation Steps
+
+1. **Clone the repository:**
+
+    ```bash
+    git clone https://github.com/ahmedabougabal/dotnet-ip-geolocation-api.git
+    ```
+
+2. **Navigate to the project directory:**
+
+    ```bash
+    cd dotnet-ip-geolocation-api
+    ```
+
+3. **Build the application:**
+
+    ```bash
+    dotnet build
+    ```
+
+4. **Run the application:**
+
+    ```bash
+    dotnet run
+    ```
+
+### Accessing Swagger UI
+
+
+Once the application is running, you can access the Swagger UI documentation using the following [link](http://localhost:5059/swagger/index.html).
+
+
+![image](https://github.com/user-attachments/assets/b5a31154-5eaa-4d16-a27b-57a466e757e3)
+
+
+
+This will open the interactive API documentation where you can test all the endpoints directly from your browser.
+
+**Note**: The port number (`5059`) might be different on your machine. Check the console output when you run the application to see the actual URL.
+
+
+  <img src="https://github.com/Govindv7555/Govindv7555/blob/main/49e76e0596857673c5c80c85b84394c1.gif" width="1000px" height="100px">
+
+
+
 # Testing my Implementation  
 **this was before refactoring the code after recognizing that the input should be the country code only and an ip address is not required based on the assignment**
 
