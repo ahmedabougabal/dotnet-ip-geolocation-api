@@ -2,7 +2,7 @@
 
 [![Project Status](https://img.shields.io/badge/status-Complete%20%2F%20Implemented-brightgreen?style=for-the-badge)](https://github.com/yourusername/mernStackMilestoneProject_ITI)
 
-# Code Documentation (the know how)
+# Code Documentation (from a business logic Perspective)
 
 **__idea behind__**
 Finally implemented a light-weight yet powerful and a scalable also an effeiciant software solution for companies or organizations that need to restrict access to their services based on geographic location or whatever their needs may be.
@@ -91,5 +91,5 @@ This will open the interactive API documentation where you can test all the endp
 
   <img src="https://github.com/Govindv7555/Govindv7555/blob/main/49e76e0596857673c5c80c85b84394c1.gif" width="1000px" height="100px">
 
-# checking for temporally expired countires and flush them out from the memory as per tasked in the assignment 
+# checking for Temporarily expired countires and flush them out from the memory as required
 ![image](https://github.com/user-attachments/assets/b79db62e-9188-4ad8-b619-37ca5a430a3d)
